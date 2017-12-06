@@ -34,7 +34,7 @@ def min_value(self,gameState,depth):
     #print(reachedDepthPair)
     if reachedDepthPair[0]:
         #print("Terminal")
-        return 1  # by Assumption 2
+        return self.score(gameState)  # by Assumption 2
     if reachedDepthPair[1]:
         #print("Depth reached")
         return self.score(gameState)
@@ -54,7 +54,7 @@ def max_value(self,gameState,depth):
     #print(reachedDepthPair)
     if reachedDepthPair[0]:
         #print("Terminal")
-        return -1  # by assumption 2
+        return self.score(gameState)   # by assumption 2
     if reachedDepthPair[1]:
         #print("Depth reached")
         return self.score(gameState)

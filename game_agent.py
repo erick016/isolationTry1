@@ -17,6 +17,7 @@ def reached_depth_test(gameState,depth,caller):
     depthReached = (depth == gameState.move_count)
     #if ttRes or depthReached:
         #print(" ttRes: " + str(ttRes) + " depthReached: " + str(depthReached) + " depth: " + str(depth))
+        #print("1")
     return (ttRes,depthReached)
 
 def terminal_test(gameState,depth,caller):
@@ -42,7 +43,7 @@ def min_value(gameState,depth,caller):
     #print(reachedDepthPair)
     if reachedDepthPair[0]:
         #print("Terminal")
-        return 1  # by Assumption 2
+        return caller.score(gameState,caller)  # by Assumption 2
     if reachedDepthPair[1]:
         #print("Depth reached")
         return caller.score(gameState,caller)
@@ -65,7 +66,7 @@ def max_value(gameState,depth,caller):
     #print(reachedDepthPair)
     if reachedDepthPair[0]:
         #print("Terminal")
-        return -1  # by assumption 2
+        return caller.score(gameState,caller)   # by assumption 2
     if reachedDepthPair[1]:
         #print("Depth reached")
         return caller.score(gameState,caller)
@@ -112,7 +113,7 @@ def alphabeta_min_value(gameState,depth,caller,alpha,beta):
     #print(reachedDepthPair)
     if reachedDepthPair[0]:
         #print("Terminal")
-        return 1  # by Assumption 2
+        return caller.score(gameState,caller)  # by Assumption 2
     if reachedDepthPair[1]:
         #print("Depth reached")
         return caller.score(gameState,caller)
@@ -139,7 +140,7 @@ def alphabeta_max_value(gameState,depth,caller,alpha,beta):
     #print(reachedDepthPair)
     if reachedDepthPair[0]:
         #print("Terminal")
-        return -1  # by assumption 2
+        return caller.score(gameState,caller) # by assumption 2
     if reachedDepthPair[1]:
         #print("Depth reached")
         return caller.score(gameState,caller)
@@ -193,8 +194,8 @@ def custom_score(game, player):
     # TODO: finish this function!
     #raise NotImplementedError
     
-    if game.time_left() < game.TIMER_THRESHOLD:
-        raise SearchTimeout()
+    #if game.time_left() < game.TIMER_THRESHOLD:
+    #    raise SearchTimeout()
 
     myOpponent = game.get_opponent(player)
     myMovesList = game.get_legal_moves(player)
@@ -225,8 +226,8 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
-    if game.time_left() < game.TIMER_THRESHOLD:
-        raise SearchTimeout()
+    #if game.time_left() < game.TIMER_THRESHOLD:
+    #    raise SearchTimeout()
 
     # TODO: finish this function!
     myMovesList = game.get_legal_moves(player)
@@ -255,8 +256,8 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
-    if game.time_left() < game.TIMER_THRESHOLD:
-        raise SearchTimeout()
+    #if game.time_left() < game.TIMER_THRESHOLD:
+    #    raise SearchTimeout()
 
     # TODO: finish this function!
     random.seed()

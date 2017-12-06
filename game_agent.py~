@@ -15,8 +15,9 @@ def reached_depth_test(gameState,depth,caller):
     
     ttRes = terminal_test(gameState,depth,caller)
     depthReached = (depth == gameState.move_count)
-    #if ttRes or depthReached:
+    if ttRes or depthReached:
         #print(" ttRes: " + str(ttRes) + " depthReached: " + str(depthReached) + " depth: " + str(depth))
+        print("1")
     return (ttRes,depthReached)
 
 def terminal_test(gameState,depth,caller):
@@ -193,7 +194,7 @@ def custom_score(game, player):
     # TODO: finish this function!
     #raise NotImplementedError
     
-    #if self.time_left() < self.TIMER_THRESHOLD:
+    #if game.time_left() < game.TIMER_THRESHOLD:
     #    raise SearchTimeout()
 
     myOpponent = game.get_opponent(player)
@@ -225,7 +226,7 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
-    #if player.time_left() < player.TIMER_THRESHOLD:
+    #if game.time_left() < game.TIMER_THRESHOLD:
     #    raise SearchTimeout()
 
     # TODO: finish this function!
@@ -255,7 +256,7 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
-    #if self.time_left() < self.TIMER_THRESHOLD:
+    #if game.time_left() < game.TIMER_THRESHOLD:
     #    raise SearchTimeout()
 
     # TODO: finish this function!
