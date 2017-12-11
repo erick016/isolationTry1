@@ -16,6 +16,8 @@ def minimax_decision(caller,game,depth,maximizingPlayer,lastMove):
         
     movesList = game.get_legal_moves(caller)
     movesListLen = len(movesList)
+
+    scoredMovesList = list()
     
     returnTuple = (0,(-1,-1))
         
@@ -40,9 +42,14 @@ def minimax_decision(caller,game,depth,maximizingPlayer,lastMove):
             forecastedMoveTuple = minimax_decision(caller,game.forecast_move(m),depth - 1, False,m)
             bestSoFar = max(bestSoFar,forecastedMoveTuple[0])
             
-        returnTuple = (bestSoFar,m)    
-        return returnTuple
+            returnTuple = (forecastedMoveTuple[0],m)
+            scoredMovesList.append(returnTuple)    
         
+
+        scoredMovesList.sort(key = lambda x: x[0]) #sorts the list and returns None
+        returnTuple = scoredMovesList[len(scoredMovesList) - 1]
+        return returnTuple
+    
     else: 
             
         bestSoFar = float('inf')
@@ -52,8 +59,14 @@ def minimax_decision(caller,game,depth,maximizingPlayer,lastMove):
             forecastedMoveTuple = minimax_decision(caller,game.forecast_move(m),depth - 1, True,m)
             bestSoFar = min(bestSoFar,forecastedMoveTuple[0])
             
-        returnTuple = (bestSoFar,m)    
+            returnTuple = (forecastedMoveTuple[0],m)
+            scoredMovesList.append(returnTuple)
+
+
+        scoredMovesList.sort(key = lambda x: x[0]) #sorts the list and returns None
+        returnTuple = scoredMovesList[0]
         return returnTuple
+
 
 #==ABdecision==
 

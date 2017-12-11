@@ -9,156 +9,117 @@ TIME_LIMIT_MILLIS = 150
 
 #==minimax_helpers.py==
 
-def reached_depth_test(gameState,depth,caller):
-    if caller.time_left() < caller.TIMER_THRESHOLD:
-        raise SearchTimeout()
-    
-    ttRes = terminal_test(gameState,depth,caller)
-    depthReached = (depth == gameState.move_count)
-    if ttRes or depthReached:
-        #print(" ttRes: " + str(ttRes) + " depthReached: " + str(depthReached) + " depth: " + str(depth))
-        print("1")
-    return (ttRes,depthReached)
-
-def terminal_test(gameState,depth,caller):
-    """ Return True if the game is over for the active player
-    and False otherwise.
-    """
-    if caller.time_left() < caller.TIMER_THRESHOLD:
-        raise SearchTimeout()
-    
-    return not bool(gameState.get_legal_moves())  # by Assumption 1
-
-
-def min_value(gameState,depth,caller):
-    """ Return the value for a win (+1) if the game is over,
-    otherwise return the minimum value over all legal child
-    nodes.
-    """
-    if caller.time_left() < caller.TIMER_THRESHOLD:
-        raise SearchTimeout()
-    
-    #if reached_depth_test(gameState,depth):
-    reachedDepthPair = reached_depth_test(gameState,depth,caller)
-    #print(reachedDepthPair)
-    if reachedDepthPair[0]:
-        #print("Terminal")
-        return 1  # by Assumption 2
-    if reachedDepthPair[1]:
-        #print("Depth reached")
-        return caller.score(gameState,caller)
-    v = float("inf")
-    for m in gameState.get_legal_moves():
-        v = min(v, max_value(gameState.forecast_move(m),depth,caller))
-    return v
-
-
-def max_value(gameState,depth,caller):
-    """ Return the value for a loss (-1) if the game is over,
-    otherwise return the maximum value over all legal child
-    nodes.
-    """
-    if caller.time_left() < caller.TIMER_THRESHOLD:
-        raise SearchTimeout()
-    
-    #if reached_depth_test(gameState,depth):
-    reachedDepthPair = reached_depth_test(gameState,depth,caller)
-    #print(reachedDepthPair)
-    if reachedDepthPair[0]:
-        #print("Terminal")
-        return -1  # by assumption 2
-    if reachedDepthPair[1]:
-        #print("Depth reached")
-        return caller.score(gameState,caller)
-    v = float("-inf")
-    for m in gameState.get_legal_moves():
-        v = max(v, min_value(gameState.forecast_move(m),depth,caller))
-    return v
-
-#==minimax.py==
-
-# This solution does the same thing using the built-in `max` function
-# Note that "lambda" expressions are Python's version of anonymous functions
-def minimax_decision(gameState,depth,caller):
-    """ Return the move along a branch of the game tree that
-    has the best possible value.  A move is a pair of coordinates
-    in (column, row) order corresponding to a legal move for
-    the searching player.
-    
-    You can ignore the special case of calling this function
-    from a terminal state.
-    """
-    if caller.time_left() < caller.TIMER_THRESHOLD:
-        raise SearchTimeout()
-    # The built in `max()` function can be used as argmax!
-    
-    #gameState.depth = depth
-    
-    return max(gameState.get_legal_moves(), key=lambda m: min_value(gameState.forecast_move(m),depth,caller)) #max(iterable[, key])
-
-#=============
-
-#==ABsearch==
-
-def alphabeta_min_value(gameState,depth,caller,alpha,beta):
-    """ Return the value for a win (+1) if the game is over,
-    otherwise return the minimum value over all legal child
-    nodes.
-    """
-    if caller.time_left() < caller.TIMER_THRESHOLD:
-        raise SearchTimeout()
-    
-    #if reached_depth_test(gameState,depth):
-    reachedDepthPair = reached_depth_test(gameState,depth,caller)
-    #print(reachedDepthPair)
-    if reachedDepthPair[0]:
-        #print("Terminal")
-        return 1  # by Assumption 2
-    if reachedDepthPair[1]:
-        #print("Depth reached")
-        return caller.score(gameState,caller)
-    v = float("inf")
-    for m in gameState.get_legal_moves():
-        v = min(v, alphabeta_max_value(gameState.forecast_move(m),depth,caller,alpha,beta))
-        if (v <= alpha):
-            return v
-        beta = min(beta,v)
-    return v
-
-
-def alphabeta_max_value(gameState,depth,caller,alpha,beta):
+def minimax_decision(caller,game,depth,maximizingPlayer,lastMove):
 
     if caller.time_left() < caller.TIMER_THRESHOLD:
-        raise SearchTimeout()
+            raise SearchTimeout()
+        
+    movesList = game.get_legal_moves(caller)
+    movesListLen = len(movesList)
     
-    """ Return the value for a loss (-1) if the game is over,
-    otherwise return the maximum value over all legal child
-    nodes.
-    """
-    #if reached_depth_test(gameState,depth):
-    reachedDepthPair = reached_depth_test(gameState,depth,caller)
-    #print(reachedDepthPair)
-    if reachedDepthPair[0]:
-        #print("Terminal")
-        return -1  # by assumption 2
-    if reachedDepthPair[1]:
-        #print("Depth reached")
-        return caller.score(gameState,caller)
-    v = float("-inf")
-    for m in gameState.get_legal_moves():
-        v = max(v, alphabeta_min_value(gameState.forecast_move(m),depth,caller,alpha,beta))
-        if (v >= beta):
-            return v
-        alpha = max(alpha,v)
-    return v
+    returnTuple = (0,(-1,-1))
+        
+    '''if (depth == 0) or (movesListLen == 0):
+        returnTuple = (caller.score(game,caller),(-1,-1))
+        return returnTuple'''
+        
+    if (movesListLen == 0):
+        returnTuple = (caller.score(game,caller),lastMove)
+        return returnTuple
+        
+    if (depth == 0):
+        returnTuple = (caller.score(game,caller),lastMove)
+        return returnTuple 
+            
+    if (maximizingPlayer): 
+            
+        bestSoFar = float('-inf')
+            
+        for m in movesList:
+        
+            forecastedMoveTuple = minimax_decision(caller,game.forecast_move(m),depth - 1, False,m)
+            bestSoFar = max(bestSoFar,forecastedMoveTuple[0])
+            
+        returnTuple = (bestSoFar,m)    
+        return returnTuple
+        
+    else: 
+            
+        bestSoFar = float('inf')
+            
+        for m in movesList:
+                
+            forecastedMoveTuple = minimax_decision(caller,game.forecast_move(m),depth - 1, True,m)
+            bestSoFar = min(bestSoFar,forecastedMoveTuple[0])
+            
+        returnTuple = (bestSoFar,m)    
+        return returnTuple
 
-def alphabeta_decision(gameState,depth,caller,alpha,beta):
+#==ABdecision==
+
+def alphabeta_decision(caller,game,depth,maximizingPlayer,alpha,beta,lastMove):
     
     if caller.time_left() < caller.TIMER_THRESHOLD:
         raise SearchTimeout()
     
-    #bestVal = alphabeta_max_value(gameState,depth,caller,float("-inf"),float("inf"))
-    return max(gameState.get_legal_moves(), key=lambda m: alphabeta_max_value(gameState.forecast_move(m),depth,caller,alpha,beta)) #max(iterable[, key])
+    movesList = game.get_legal_moves(caller)
+    movesListLen = len(movesList)
+
+    scoredMovesList = list()
+        
+    returnTuple = (0,(-1,-1))
+
+    scoredMovesList.append(returnTuple)
+    
+    '''if (depth == 0) or (movesListLen == 0):
+        returnTuple = (caller.score(game,caller),(-1,-1))
+        return returnTuple'''
+
+    if (movesListLen == 0):
+        returnTuple = (game.utility(caller),(-1,-1))
+        return returnTuple
+        
+    if (depth == 0):
+        
+        returnTuple = (caller.score(game,caller),movesList[0])
+        return returnTuple
+        
+    if (maximizingPlayer):
+    
+        bestSoFar = float('-inf')
+        
+        for m in movesList:
+            forecastedMoveTuple = alphabeta_decision(caller,game.forecast_move(m),depth - 1,False,alpha, beta,m)
+            bestSoFar = max(bestSoFar, forecastedMoveTuple[0])
+            alpha = max(alpha, bestSoFar)
+            if beta <= alpha:
+                break
+            
+            returnTuple = (forecastedMoveTuple[0],m)
+            scoredMovesList.append(returnTuple)
+
+        scoredMovesList.sort(key = lambda x: x[0]) #sorts the list and returns None
+        returnTuple = scoredMovesList[len(scoredMovesList) - 1]    
+        return returnTuple
+
+    else:
+
+        bestSoFar = float('inf')
+        
+        for m in movesList:
+            forecastedMoveTuple = alphabeta_decision(caller,game.forecast_move(m),depth - 1,True,alpha, beta,m)
+            bestSoFar = min (bestSoFar, forecastedMoveTuple[0])
+            beta = min(beta, bestSoFar)
+            if beta <= alpha:
+                break
+
+
+            returnTuple = (forecastedMoveTuple[0],m)
+            scoredMovesList.append(returnTuple)
+        
+        scoredMovesList.sort(key = lambda x: x[0])
+        returnTuple = scoredMovesList[0]  
+        return returnTuple
 
 #=============
 
@@ -296,7 +257,7 @@ class IsolationPlayer:
 
 class MinimaxPlayer(IsolationPlayer):
 
-    def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
+    def __init__(self, search_depth=3, score_fn=custom_score_2, timeout=10.):
         super(MinimaxPlayer, self).__init__(search_depth, score_fn, timeout)
 
     def get_move(self, game, time_left):
@@ -337,7 +298,7 @@ class MinimaxPlayer(IsolationPlayer):
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
             best_move = self.minimax(game, self.search_depth)
-            print(best_move)
+            #print(best_move)
             return best_move
             #return self.minimax(game, self.search_depth)
 
@@ -398,7 +359,8 @@ class MinimaxPlayer(IsolationPlayer):
         
         return legal_moves[0]"""
         
-        return minimax_decision(game,depth,self)
+        result = minimax_decision(self,game,depth,True,(-1,-1))
+        return(result[1])
 
 
 class AlphaBetaPlayer(IsolationPlayer):
@@ -450,7 +412,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
             best_move = self.alphabeta(game, self.search_depth)
-            print(best_move)
+            #print(best_move)
             return best_move
             #return self.minimax(game, self.search_depth)
 
@@ -508,4 +470,5 @@ class AlphaBetaPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        return(alphabeta_decision(game,depth,self,alpha,beta))
+        result = alphabeta_decision(self,game,depth,True,alpha,beta,(-1,-1))
+        return(result[1])
