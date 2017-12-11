@@ -34,10 +34,15 @@ class Board(object):
         The number of rows that the board should have.
     """
 
+    '''def time_left(self): 
+        time_millis = lambda: 1000 * timeit.default_timer()
+        move_start = time_millis()
+        return(time_limit - (time_millis() - move_start))'''
+        
     def time_left(self): 
         time_millis = lambda: 1000 * timeit.default_timer()
         move_start = time_millis()
-        return(time_limit - (time_millis() - move_start))
+        return(TIME_LIMIT_MILLIS - (time_millis() - move_start))
 
     BLANK = 0
     NOT_MOVED = None

@@ -298,7 +298,7 @@ class MinimaxPlayer(IsolationPlayer):
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
             best_move = self.minimax(game, self.search_depth)
-            #print(best_move)
+            print(best_move)
             return best_move
             #return self.minimax(game, self.search_depth)
 
@@ -412,7 +412,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
             best_move = self.alphabeta(game, self.search_depth)
-            #print(best_move)
+            print(best_move)
             return best_move
             #return self.minimax(game, self.search_depth)
 
