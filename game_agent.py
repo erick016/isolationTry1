@@ -89,7 +89,7 @@ def alphabeta_decision(caller,game,depth,maximizingPlayer,alpha,beta,lastMove):
         return returnTuple'''
 
     if (movesListLen == 0):
-        returnTuple = (game.utility(caller),(-1,-1))
+        returnTuple = (game.utility(caller),lastMove)
         return returnTuple
         
     if (depth == 0):
