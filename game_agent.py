@@ -89,12 +89,12 @@ def alphabeta_decision(caller,game,depth,maximizingPlayer,alpha,beta,lastMove):
         return returnTuple'''
 
     if (movesListLen == 0):
-        returnTuple = (game.utility(caller),lastMove)
+        returnTuple = (caller.score(game,caller),lastMove)
         return returnTuple
         
     if (depth == 0):
         
-        returnTuple = (caller.score(game,caller),movesList[0])
+        returnTuple = (caller.score(game,caller),lastMove)
         return returnTuple
         
     if (maximizingPlayer):
@@ -310,6 +310,7 @@ class MinimaxPlayer(IsolationPlayer):
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
+            
             best_move = self.minimax(game, self.search_depth)
             #print(best_move)
             return best_move
@@ -420,17 +421,23 @@ class AlphaBetaPlayer(IsolationPlayer):
         # Initialize the best move so that this function returns something
         # in case the search fails due to timeout
         best_move = (-1, -1)
-
+        self.search_depth = 1
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
-            best_move = self.alphabeta(game, self.search_depth)
-            #print(best_move)
-            return best_move
-            #return self.minimax(game, self.search_depth)
+            while (True):
+                move = self.alphabeta(game, self.search_depth)
+                #print(best_move)
+                if move is not (-1,-1):
+                    best_move = move
+                self.search_depth += 1
+                
+                #return self.minimax(game, self.search_depth)
+                if self.time_left() < self.TIMER_THRESHOLD:
+                    return best_move
 
         except SearchTimeout:
-            pass  # Handle any actions required after timeout as needed
+            return best_move  # Handle any actions required after timeout as needed
             
         # Return the best move from the last completed search iteration
         return best_move
