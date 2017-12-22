@@ -9,130 +9,145 @@ TIME_LIMIT_MILLIS = 150
 
 #==minimax_helpers.py==
 
-def minimax_decision(caller,game,depth,maximizingPlayer,lastMove):
+def minimax_decision(caller,game,depth,maximizingPlayer):
 
     if caller.time_left() < caller.TIMER_THRESHOLD:
             raise SearchTimeout()
         
-    movesList = game.get_legal_moves(caller)
+    if (maximizingPlayer):
+        movesList = game.get_legal_moves(caller)
+    else:
+        movesList = game.get_legal_moves(game.get_opponent(caller))
     movesListLen = len(movesList)
-
-    scoredMovesList = list()
     
-    returnTuple = (0,(-1,-1))
+    #returnTuple = (0,(-1,-1))
         
     '''if (depth == 0) or (movesListLen == 0):
         returnTuple = (caller.score(game,caller),(-1,-1))
         return returnTuple'''
         
     if (movesListLen == 0):
-        returnTuple = (caller.score(game,caller),lastMove)
-        return returnTuple
+        myScore = (caller.score(game,caller))
+        return myScore
         
     if (depth == 0):
-        returnTuple = (caller.score(game,caller),lastMove)
-        return returnTuple 
+        myScore = (caller.score(game,caller))
+        return myScore 
             
     if (maximizingPlayer): 
             
         bestSoFar = float('-inf')
+        myScore = bestSoFar
+        #bestSoFarCurr = bestSoFar
             
         for m in movesList:
         
-            forecastedMoveTuple = minimax_decision(caller,game.forecast_move(m),depth - 1, False,m)
-            bestSoFar = max(bestSoFar,forecastedMoveTuple[0])
+            myScore = minimax_decision(caller,game.forecast_move(m),depth - 1, False)
             
-            returnTuple = (forecastedMoveTuple[0],m)
-            scoredMovesList.append(returnTuple)    
-        
+            bestSoFar = max(bestSoFar,myScore)
+                        
+            #if (bestSoFar > bestSoFarCurr):
+                                
+                #returnScore = score
 
-        scoredMovesList.sort(key = lambda x: x[0]) #sorts the list and returns None
-        returnTuple = scoredMovesList[len(scoredMovesList) - 1]
-        return returnTuple
+        #scoredMovesList.sort(key = lambda x: x[0]) #sorts the list and returns None
+
+        return bestSoFar
     
     else: 
             
         bestSoFar = float('inf')
-            
+        myScore = bestSoFar
+        #bestSoFarCurr = bestSoFar
+        
         for m in movesList:
                 
-            forecastedMoveTuple = minimax_decision(caller,game.forecast_move(m),depth - 1, True,m)
-            bestSoFar = min(bestSoFar,forecastedMoveTuple[0])
+            myScore = minimax_decision(caller,game.forecast_move(m),depth - 1, True)
             
-            returnTuple = (forecastedMoveTuple[0],m)
-            scoredMovesList.append(returnTuple)
+            bestSoFar = min(bestSoFar,myScore)
+            
+            #if (bestSoFar < bestSoFarCurr):
+                
+                #returnScore= score
+            
 
-
-        scoredMovesList.sort(key = lambda x: x[0]) #sorts the list and returns None
-        returnTuple = scoredMovesList[0]
-        return returnTuple
+        #scoredMovesList.sort(key = lambda x: x[0]) #sorts the list and returns None
+        return bestSoFar
 
 
 #==ABdecision==
 
-def alphabeta_decision(caller,game,depth,maximizingPlayer,alpha,beta,lastMove):
+def alphabeta_decision(caller,game,depth,maximizingPlayer,alpha,beta):
     
     if caller.time_left() < caller.TIMER_THRESHOLD:
         raise SearchTimeout()
     
-    movesList = game.get_legal_moves(caller)
+    if (maximizingPlayer):
+        movesList = game.get_legal_moves(caller)
+    else:
+        movesList = game.get_legal_moves(game.get_opponent(caller))
     movesListLen = len(movesList)
 
-    scoredMovesList = list()
+    #scoredMovesList = list()
         
-    returnTuple = (0,(-1,-1))
+    #returnTuple = (0,(-1,-1))
 
-    scoredMovesList.append(returnTuple)
+    #scoredMovesList.append(returnTuple)
     
     '''if (depth == 0) or (movesListLen == 0):
         returnTuple = (caller.score(game,caller),(-1,-1))
         return returnTuple'''
 
     if (movesListLen == 0):
-        returnTuple = (caller.score(game,caller),lastMove)
-        return returnTuple
+        myScore = (caller.score(game,caller))
+        return myScore
         
     if (depth == 0):
         
-        returnTuple = (caller.score(game,caller),lastMove)
-        return returnTuple
+        myScore = (caller.score(game,caller))
+        return myScore
         
     if (maximizingPlayer):
     
         bestSoFar = float('-inf')
-        
+        myScore = bestSoFar        
+
         for m in movesList:
-            forecastedMoveTuple = alphabeta_decision(caller,game.forecast_move(m),depth - 1,False,alpha, beta,m)
-            bestSoFar = max(bestSoFar, forecastedMoveTuple[0])
-            alpha = max(alpha, bestSoFar)
+            myScore = alphabeta_decision(caller,game.forecast_move(m),depth - 1,False,alpha, beta)
+            
+            myScore = max(bestSoFar, myScore)
+            
+            if (myScore > bestSoFar):
+                bestSoFar = myScore
+            
+            alpha = max(alpha, myScore)
             if beta <= alpha:
                 break
-            
-            returnTuple = (forecastedMoveTuple[0],m)
-            scoredMovesList.append(returnTuple)
+           
 
-        scoredMovesList.sort(key = lambda x: x[0]) #sorts the list and returns None
-        returnTuple = scoredMovesList[len(scoredMovesList) - 1]    
-        return returnTuple
+        #scoredMovesList.sort(key = lambda x: x[0]) #sorts the list and returns None
+        #returnTuple = scoredMovesList[0]    
+        return myScore
 
     else:
 
         bestSoFar = float('inf')
-        
+        myScore = bestSoFar
         for m in movesList:
-            forecastedMoveTuple = alphabeta_decision(caller,game.forecast_move(m),depth - 1,True,alpha, beta,m)
-            bestSoFar = min (bestSoFar, forecastedMoveTuple[0])
-            beta = min(beta, bestSoFar)
+            myScore = alphabeta_decision(caller,game.forecast_move(m),depth - 1,True,alpha, beta)
+                        
+            myScore = min (bestSoFar, myScore)
+            
+            if (myScore < bestSoFar):
+                bestSoFar = myScore
+            
+            beta = min(beta, myScore)
             if beta <= alpha:
-                break
-
-
-            returnTuple = (forecastedMoveTuple[0],m)
-            scoredMovesList.append(returnTuple)
+                break    
         
-        scoredMovesList.sort(key = lambda x: x[0])
-        returnTuple = scoredMovesList[0]  
-        return returnTuple
+        #scoredMovesList.sort(key = lambda x: x[0])
+        #returnTuple = scoredMovesList[0]  
+        return myScore
 
 #=============
 
@@ -361,9 +376,7 @@ class MinimaxPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
-        timeLeftResult = self.time_left()
-        if timeLeftResult < self.TIMER_THRESHOLD:
-            raise SearchTimeout()
+
 
         # TODO: finish this function!
         #raise NotImplementedError
@@ -373,8 +386,27 @@ class MinimaxPlayer(IsolationPlayer):
         
         return legal_moves[0]"""
         
-        result = minimax_decision(self,game,depth,True,(-1,-1))
-        return(result[1])
+        movesList = game.get_legal_moves(self)
+        if not movesList:
+            return (-1,-1)
+        
+        self.bestScoreSoFar = float('-inf')
+        self.bestMoveSoFar = movesList[0]
+        
+        for m in movesList:
+            timeLeftResult = self.time_left()
+            if timeLeftResult < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
+            examinedState = game.forecast_move(m)
+            examinedScore = minimax_decision(self,examinedState,depth - 1,False)
+            if examinedScore > self.bestScoreSoFar:
+                self.bestScoreSoFar = examinedScore
+                self.bestMoveSoFar = m
+        return self.bestMoveSoFar
+        
+        #result = minimax_decision(self,game,depth,True,(-1,-1))
+        #return(result[1])
 
 
 class AlphaBetaPlayer(IsolationPlayer):
@@ -487,8 +519,33 @@ class AlphaBetaPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
-        if self.time_left() < self.TIMER_THRESHOLD:
-            raise SearchTimeout()
+        #if self.time_left() < self.TIMER_THRESHOLD:
+            #raise SearchTimeout()
 
-        result = alphabeta_decision(self,game,depth,True,alpha,beta,(-1,-1))
-        return(result[1])
+        #result = alphabeta_decision(self,game,depth,True,alpha,beta,(-1,-1))
+        #return(result[1])
+
+        movesList = game.get_legal_moves(self)
+        if not movesList:
+            return (-1,-1)
+        
+        self.bestScoreSoFar = float('-inf')
+        self.bestMoveSoFar = movesList[0]
+            
+        for m in movesList:
+            timeLeftResult = self.time_left()
+            if timeLeftResult < self.TIMER_THRESHOLD:
+                raise SearchTimeout()
+
+            examinedState = game.forecast_move(m)
+            examinedScore = alphabeta_decision(self,examinedState,depth - 1,False,alpha,beta)
+            
+            if self.bestScoreSoFar > alpha:
+                    alpha = self.bestScoreSoFar
+            
+                    if examinedScore > self.bestScoreSoFar:
+                        self.bestScoreSoFar = examinedScore
+                        self.bestMoveSoFar = m
+            
+            
+        return self.bestMoveSoFar
