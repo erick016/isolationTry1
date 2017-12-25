@@ -127,8 +127,8 @@ class MinimaxPlayer(IsolationPlayer):
     minimax to return a good move before the search time limit expires.
     """
     
-    def __init__(self):
-        IsolationPlayer.__init__(self)
+    def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
+        super(MinimaxPlayer, self).__init__(search_depth, score_fn, timeout)
     
    #     print(self.search_depth + "WAAAA")
 
@@ -161,7 +161,7 @@ class MinimaxPlayer(IsolationPlayer):
             (-1, -1) if there are no available legal moves.
         """
         
-        print("My search depth: " + str(self.search_depth))
+        #print("My search depth: " + str(self.search_depth))
         
         self.time_left = time_left
 
@@ -219,7 +219,7 @@ class MinimaxPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
-        game.start_timer(self.TIMER_THRESHOLD)
+        #game.start_timer(self.TIMER_THRESHOLD)
         
         movesList = game.get_legal_moves(self)
         movesListLen = len(movesList)
@@ -263,6 +263,12 @@ class AlphaBetaPlayer(IsolationPlayer):
     make sure it returns a good move before the search time limit expires.
     """
 
+    #def __init__(self):
+    #    IsolationPlayer.__init__(self)
+    
+    def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
+        super(AlphaBetaPlayer, self).__init__(search_depth, score_fn, timeout)
+
     def get_move(self, game, time_left):
         """Search for the best move from the available legal moves and return a
         result before the time limit expires.
@@ -294,15 +300,24 @@ class AlphaBetaPlayer(IsolationPlayer):
             (-1, -1) if there are no available legal moves.
         """
 
-        game.start_timer()
-        
-        if game.time_left() < self.TIMER_THRESHOLD:
-            raise SearchTimeout()
-        
-        # TODO: finish this function!
-        #raise NotImplementedError
+        self.time_left = time_left
 
-    def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
+        # Initialize the best move so that this function returns something
+        # in case the search fails due to timeout
+        best_move = (-1, -1)
+
+        try:
+            # The try/except block will automatically catch the exception
+            # raised when the timer is about to expire.
+            return self.alphabeta(game, self.search_depth, True)
+
+        except SearchTimeout:
+            pass  # Handle any actions required after timeout as needed
+
+        # Return the best move from the last completed search iteration
+        return best_move
+
+    def alphabeta(self, game, depth, maximizingPlayer, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
         described in the lectures.
 
@@ -347,8 +362,42 @@ class AlphaBetaPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
+        #game.start_timer(self.TIMER_THRESHOLD)
+
+        
+        movesList = game.get_legal_moves(self)
+        movesListLen = len(movesList)
+        
+        if (depth == 0) or (movesListLen == 0):
+            return self.score(game,self)
+
+        if (maximizingPlayer):
+            
+            bestSoFar = float('-inf')
+
+            for m in movesList:
+
+                bestSoFar = max(bestSoFar, self.alphabeta(game,depth - 1,False,alpha, beta))
+                alpha = max(alpha, bestSoFar)
+                if beta <= alpha:
+                    break
+            
+            return (bestSoFar)
+
+        else:
+
+            bestSoFar = float('inf')
+
+            for m in movesList:
+
+                bestSoFar = min (bestSoFar,self.alphabeta(game,depth - 1,True,alpha,beta))
+                beta = min(beta, bestSoFar)
+                if beta <= alpha:
+                    break
+
+            return(bestSoFar)
+
         if game.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+
