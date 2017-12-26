@@ -11,8 +11,7 @@ import random
 import timeit
 from copy import copy
 
-TIME_LIMIT_MILLIS = 150 #.15 seconds
-
+TIME_LIMIT_MILLIS = 150
 
 class Board(object):
     """Implement a model for the game Isolation assuming each player moves like
@@ -34,24 +33,25 @@ class Board(object):
     height : int (optional)
         The number of rows that the board should have.
     """
+
+    '''def time_left(self): 
+        time_millis = lambda: 1000 * timeit.default_timer()
+        move_start = time_millis()
+        return(time_limit - (time_millis() - move_start))'''
+        
+    def time_left(self): 
+        time_millis = lambda: 1000 * timeit.default_timer()
+        move_start = time_millis()
+        return(TIME_LIMIT_MILLIS - (time_millis() - move_start))
+
     BLANK = 0
     NOT_MOVED = None
 
-    time_limit = TIME_LIMIT_MILLIS
-    start_time = 0
-    
-    def start_timer(self,_time_limit):
-        time_limit = _time_limit
-        start_time = 1000 * timeit.default_timer()
-    
-    def time_left(self):
-        
-        return self.time_limit - (timeit.default_timer() * 1000 - self.start_time)
-        
     def __init__(self, player_1, player_2, width=7, height=7):
         self.width = width
         self.height = height
         self.move_count = 0
+        #self.depth = 0 #set so we don't exceed number of plys
         self._player_1 = player_1
         self._player_2 = player_2
         self._active_player = player_1
@@ -59,7 +59,7 @@ class Board(object):
 
         # The last 3 entries of the board state includes initiative (0 for
         # player 1, 1 for player 2) player 2 last move, and player 1 last move
-        self._board_state = [Board.BLANK] * (width * height + 3) #make copies of BLANK
+        self._board_state = [Board.BLANK] * (width * height + 3)
         self._board_state[-1] = Board.NOT_MOVED
         self._board_state[-2] = Board.NOT_MOVED
 
@@ -211,10 +211,10 @@ class Board(object):
             the active player on the board.
         """
         idx = move[0] + move[1] * self.height
-        last_move_idx = int(self.active_player == self._player_2) + 1
-        self._board_state[-last_move_idx] = idx
+        last_move_idx = int(self.active_player == self._player_2) + 1 #1 or 2
+        self._board_state[-last_move_idx] = idx #grab last move from -1 or -2
         self._board_state[idx] = 1
-        self._board_state[-3] ^= 1
+        self._board_state[-3] ^= 1 #starts at 0, flip back & forth
         self._active_player, self._inactive_player = self._inactive_player, self._active_player
         self.move_count += 1
 
